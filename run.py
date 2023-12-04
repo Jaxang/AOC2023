@@ -37,7 +37,7 @@ def check_all_days():
                     end = time()
                     durations[day] = end-start
         except NotImplementedError:
-            print(f"day not implemented yet")
+            print(f"{pretty_day(day)} not implemented yet")
             break
     else:
         print(f"Yaay! You are done with everything!") 
@@ -50,8 +50,10 @@ def pretty_day(day):
 
 if __name__ == "__main__":
     args = get_args()
-    print(pretty_day(args.day))
-    day_code = run_day(args.day)
+    if args.day == "All days":
+        print("Checking Progress")
+        check_all_days()
+    else:
+        print(pretty_day(args.day))
+        day_code = run_day(args.day)
 
-    print("\n\nChecking Progress")
-    check_all_days()
