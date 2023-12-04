@@ -55,14 +55,12 @@ zoneight234
     assert test_digits == [29, 83, 13, 24, 42, 14, 76]
     assert get_calibration_sum(test_text, star_one=False) == 281
 
-def get_answer(star_one=True):
-    with open("day_1/input.txt") as f:
-        print(get_calibration_sum(f.read(), star_one=star_one))
+def get_answer(text, star_one=True):
+    print(get_calibration_sum(text, star_one=star_one))
     
-
-if __name__ == "__main__":
+def main(input_text):
     test_example()
     test_example(star_one=False)
     test_example_2()
-    get_answer(star_one=True)
-    get_answer(star_one=False)
+    get_answer(input_text, star_one=True)
+    get_answer(input_text, star_one=False)

@@ -1,6 +1,6 @@
 USED_CUBES = {"blue":14, "red":12, "green":13}
 
-def test_example(star_one=True):
+def test_example():
     test_text = """Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
@@ -12,12 +12,8 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"""
     minimum_powers = get_minimum_powers(test_lines)
     assert sum(minimum_powers) == 2286
 
-def test_example_2():
-    pass
-
-def get_answer(star_one=True):
-    with open("day_2/input.txt") as f:
-        lines = f.read().split("\n")
+def get_answer(text):
+        lines = text.split("\n")
         valid_ids = valid_game_ids(lines)
         print(sum(valid_ids))
         minimum_powers = get_minimum_powers(lines)
@@ -61,9 +57,6 @@ def parse_outcome(outcome):
     return output
 
         
-if __name__ == "__main__":
+def main(input_text):
     test_example()
-    test_example(star_one=False)
-    test_example_2()
-    get_answer(star_one=True)
-    get_answer(star_one=False)
+    get_answer(input_text)
