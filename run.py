@@ -52,7 +52,7 @@ if __name__ == "__main__":
     args = get_args()
     if args.day == "All days":
         print("Checking Progress")
-        check_all_days()
+        day_code = check_all_days()
     else:
         print(pretty_day(args.day))
         day_code = run_day(args.day)
