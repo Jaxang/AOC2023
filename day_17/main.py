@@ -20,7 +20,7 @@ def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
     rows, cols = grid.shape
     
     open_set = []
-    closed_set = set()
+    closed_set = dict()
     
     start_state = (start, (0,0), 0)
     
@@ -29,13 +29,15 @@ def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
     
     while open_set:
         current_cost, current_node, current_move, current_steps = heapq.heappop(open_set)
-        current_state = (current_node, current_move, current_steps)
+        current_state = (current_node, current_move)
         
         if current_node == goal:
             return current_cost
-        if current_state in closed_set:
+        if current_steps >= closed_set.get(current_state, maximum_steps+1):
             continue
-        closed_set.add((current_state))
+        for i in range(minimum_steps, current_steps+1):
+            old_node = current_node - np.array(current_move) * (current_steps-minimum_steps)
+            closed_set[(tuple(old_node), current_move)] = i
         
         for move in movements:
             if move == MOVE_MAP[current_move]:
@@ -48,15 +50,15 @@ def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
             for _ in range(steps_to_take):
                 steps += 1
                 neighbor += np.array(move)
-                new_state = (tuple(neighbor), tuple(move), steps)
+                new_state = (tuple(neighbor), tuple(move))
                 if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
                     cost_diff  += grid[*neighbor]
                 else:
                     break
 
-            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and steps<=maximum_steps and new_state not in closed_set:
+            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and steps<=maximum_steps and steps < closed_set.get(new_state, maximum_steps+1):
                 new_cost = current_cost  + cost_diff
-                heapq.heappush(open_set, (new_cost,)+ new_state)
+                heapq.heappush(open_set, (new_cost,)+ new_state + (steps, ))
     return None
 
 def reconstruct_path(start, goal, came_from):
