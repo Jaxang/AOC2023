@@ -2,8 +2,6 @@ import heapq
 
 import numpy as np
 
-ROW_MOVES = ((-1, 0), (1, 0))
-COL_MOVES = ((0,-1), (0,1))
 MOVE_MAP = {
     (0,0): (0,0),
     (-1,0): (1,0), 
@@ -11,21 +9,11 @@ MOVE_MAP = {
     (0,-1): (0,1), 
     (0,1): (0,-1)
 }
-M = {
-    (0,0): ".",
-    (-1,0): "^",
-    (1,0): "v",
-    (0,-1): "<",
-    (0,1): ">",
-}
 
 def parse_input(text):
     cols = text.find("\n")
     grid = np.array(list(map(int, text.replace("\n", "")))).reshape(-1, cols)
     return grid
-
-def heuristic(node, goal):
-    return np.abs(np.array(node) - np.array(goal)).sum()
 
 def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
     movements = [(-1, 0), (1, 0), (0, -1), (0, 1)]
@@ -35,9 +23,6 @@ def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
     closed_set = set()
     
     start_state = (start, (0,0), 0)
-    g_values = {start_state: 0}
-    came_from = {}
-    #start_dist = heuristic(start, goal)
     
     
     heapq.heappush(open_set, (0, ) + start_state)
@@ -47,7 +32,7 @@ def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
         current_state = (current_node, current_move, current_steps)
         
         if current_node == goal:
-            return current_cost, reconstruct_path(start_state, current_state, came_from)
+            return current_cost
         if current_state in closed_set:
             continue
         closed_set.add((current_state))
@@ -55,20 +40,23 @@ def astar(grid, start, goal, minimum_steps=1, maximum_steps=3):
         for move in movements:
             if move == MOVE_MAP[current_move]:
                 continue
-            steps = current_steps+1 if move == current_move else 1
-            neighbor = np.array(current_node) + np.array(move)
-            new_state = (tuple(neighbor), tuple(move), steps)
+            steps_to_take = 1 if move == current_move else minimum_steps
+            steps = current_steps if move == current_move else 0
             
-            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and steps<=maximum_steps:
-                #tentative_g = g_values[current_state] + grid[*neighbor]
-                new_cost = current_cost  + grid[*neighbor]
-                
-                if new_state not in closed_set:
-                    #g_values[new_state] = tentative_g
-                    #cost = tentative_g #+ heuristic(neighbor, goal)
-                    came_from[new_state] = current_state
-                    heapq.heappush(open_set, (new_cost,)+ new_state)
-    
+            cost_diff = 0
+            neighbor = np.array(current_node)
+            for _ in range(steps_to_take):
+                steps += 1
+                neighbor += np.array(move)
+                new_state = (tuple(neighbor), tuple(move), steps)
+                if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                    cost_diff  += grid[*neighbor]
+                else:
+                    break
+
+            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols and steps<=maximum_steps and new_state not in closed_set:
+                new_cost = current_cost  + cost_diff
+                heapq.heappush(open_set, (new_cost,)+ new_state)
     return None
 
 def reconstruct_path(start, goal, came_from):
@@ -88,7 +76,8 @@ def solution(text):
     grid = parse_input(text)
     rows, cols = grid.shape
     minimum_cost = astar(grid, (0,0), (rows-1, cols-1))
-    return minimum_cost
+    minimum_cost_2 = astar(grid, (0,0), (rows-1, cols-1), 4, 10)
+    return minimum_cost, minimum_cost_2
 
 
 def test_example():
@@ -105,7 +94,13 @@ def test_example():
 1224686865563
 2546548887735
 4322674655533"""
+    test_text_2 = """111111111111
+999999999991
+999999999991
+999999999991
+999999999991"""
     print(solution(test_text))
+    print(solution(test_text_2))
     
 
 def get_answer(input_text):
